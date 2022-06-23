@@ -1,9 +1,14 @@
 const express= require('express');
 const router = express.Router();
-const sauceCrtl = require('../controllers/sauce');
-const auth = require('../middleware/auth');
 
-router.post('/', auth,  sauceCrtl.createSauce);
+/* Requiring these modules */
+const auth = require('../middleware/auth');
+const multer = require('../middleware/multer-config')
+const sauceCrtl = require('../controllers/sauce');
+
+
+/* end point sauces */
+router.post('/', auth, multer, sauceCrtl.createSauce);
 router.get("/", auth, sauceCrtl.getAllSauce);
 router.get("/:id", auth, sauceCrtl.getOneSauce);
 
