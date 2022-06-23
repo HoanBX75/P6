@@ -192,14 +192,83 @@ exports.upDateSauce = (req, res, next) => {
         const funcName =  scriptname + ' - likeDisslikeSauce : ';
         const userId = req.body.userId;
         const like = req.body.like;
-        // Search for a sauce with the id 
+      
         console.log("============");
         console.log (funcName + " userId   ", userId);
         console.log (funcName + " like   ", like);
-        res.status(201).json({message: 'like/dislike mis à jour.'})
+        console.log (funcName + " sauce id   ", req.params.id);
 
-    }
+         // Search for a sauce with the id 
+        Sauce.findOne({_id: req.params.id})
+        .then((sauce) => {
+
+             // Get the  likes 
+             let usersLiked =  sauce.usersLiked;
+             let usersDisliked =  sauce.usersDisliked;
+            let new_usersLiked = [];
+            let new_usersDisliked =  [];
 
 
+             // Get the unlikes   
+
+            console.log (funcName + " sauce found   ", sauce);
+            switch (like) {
+                case 0: 
+                    // the user cancels his choice 
+                    // so we need to remove the user from the like list or dislike list 
+                    // https://developer.mozilla.org/fr/docs/Learn/JavaScript/First_steps/Arrays
+
+                    let l_liked = usersLiked.length;
+                    new_usersLiked = usersLiked.filter (function(value, index, arr){ 
+                        return userId != value ; });
+
+                   
+                    new_usersDisliked = usersDisliked.filter (function(value, index, arr){ 
+                            return userId != value ; });
+   
+                    break;
+                case 1 :   
+                    // the user likes 
+                    // add the user in the like list 
+                    usersLiked.push (userId);
+                    new_usersLiked = usersLiked;
+                    new_usersDisliked = usersDisliked;
+                    break;
+                case -1 :   
+                // the user does not like 
+                // add the user in the dikslike list  
+                    usersDisliked.push (userId);
+                    new_usersDisliked = usersDisliked;
+                    new_usersLiked = usersLiked;
+                    break;
+        
+            }
+
+            console.log (funcName + " new usersLiked   ", new_usersLiked);
+            console.log (funcName + " new usersLiked  length  ", new_usersLiked.length);
+            console.log (funcName + " new usersDisliked   ", new_usersDisliked);
+            console.log (funcName + " new usersLiked  length  ", new_usersDisliked.length);
+            // Update the sauce 
+            const newSauceLikeDislike = {
+                usersLiked: new_usersLiked,
+                usersDisliked: new_usersDisliked,
+                likes: new_usersLiked.length,
+                dislikes: new_usersDisliked.length
+            }
+
+           
+
+            Sauce.updateOne({ _id: req.params.id }, {...newSauceLikeDislike, _id: req.params.id})
+            .then(()=> res.status(201).json({message: 'like/dislike mis à jour.'}))
+            .catch(error => res.status(400).json({error}));
+
+
+        })
+        .catch(error => res.status(400).json({error}));
+       
+
+  
+
+}
 
 console.log (scriptname + 'end '  );
