@@ -4,7 +4,7 @@ console.log (scriptname + 'begin '  );
 
 // 1.  CREATE SAUCE 
 
-    exports.createSauce = (req, res, next) => {
+exports.createSauce = (req, res, next) => {
     const funcName =  scriptname + ' - createSauce : ';
         console.log (funcName + "debut");
         console.log (funcName  + " req.body = ", req.body);
@@ -36,11 +36,9 @@ console.log (scriptname + 'begin '  );
             sauce.save()
             .then(() => res.status(201).json({message: "Sauce ajouté !"}))
             .catch((error) => res.status(400).json({error}))
-        }
+}
         
     
-     
-
 // 2. GET ALL SAUCE
 exports.getAllSauce = (req, res, next) => {
     console.log (scriptname + 'getAllSauce '  );
@@ -53,21 +51,36 @@ exports.getAllSauce = (req, res, next) => {
 // 3. GET ONE SAUCE 
 exports.getOneSauce = (req, res, next) => {
     console.log (scriptname + 'getOneSauce '  );
-    
+
         Sauce.findOne({_id: req.params.id})
         .then(sauce => res.status(200).json(sauce))
         .catch(error => res.status(400).json({error}));
     }
 
-
 // 4. DELETE  ONE SAUCE 
 
-    exports.deleteSauce = (req, res, next) =>{
- 
+exports.deleteSauce = (req, res, next) =>{
+    const funcName =  scriptname + ' - deleteSauce : ';
+    console.log (funcName + " sauce id (params id ) = ", req.params.id);
+
+    // Search for a sauce with the id 
+    Sauce.findOne({_id: req.params.id})
+    .then(sauce => {
+            console.log (funcName + " Found sauce id = ", req.params.id);
+            const filename = sauce.imageUrl.split('/images/')[1];
+            console.log (funcName + " Image Filename to remove  = ", filename);
+            res.status(200).json({message: 'Sauce supprimé.'});
+            })
+    .catch(error => res.status(400).json({error}));
+
+   //  res.status(200).json({message: 'Sauce supprimé.'});
+/*    
     Sauce.deleteOne({_id: req.params.id})
      .then(() => res.status(200).json({message: 'Sauce supprimé.'}))
                     .catch(error => res.status(400).json({error}));
-    }
+
+*/                    
+}
     
 
 // 5. LIKE  DISLIKE SAUCE     
