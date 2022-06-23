@@ -1,4 +1,5 @@
 const Sauce = require('../models/sauce');
+const fs = require('fs');
 scriptname = 'controllers/sauce.js : ';
 console.log (scriptname + 'begin '  );
 
@@ -17,16 +18,17 @@ exports.createSauce = (req, res, next) => {
             delete req.body._id
             console.log (funcName  + " req.sauceObjet (after delete _id) = ", sauceObjet);
       
-      //   let url = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+         let url0 = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+         console.log (funcName  + " url0  ", url0);
 
-        let url = "http://www.hoanbx.fr/Projects/P3/images/restaurants/jay-wennington-N_Y88TWmGwA-unsplash.jpg";
-        console.log (funcName  + " url  ", url);
+     //    let url = "http://www.hoanbx.fr/Projects/P3/images/restaurants/jay-wennington-N_Y88TWmGwA-unsplash.jpg";
+     //    console.log (funcName  + " url  ", url);
 
             const sauce = new Sauce ({
                 ...sauceObjet,
                 likes: 0,
                 dislikes:0,
-                imageUrl: url ,
+                imageUrl: url0 ,
                 usersLiked: [],
                 usersDisliked: [],
             })
@@ -66,12 +68,28 @@ exports.deleteSauce = (req, res, next) =>{
     // Search for a sauce with the id 
     Sauce.findOne({_id: req.params.id})
     .then(sauce => {
-            console.log (funcName + " Found sauce id = ", req.params.id);
-            const filename = sauce.imageUrl.split('/images/')[1];
-            console.log (funcName + " Image Filename to remove  = ", filename);
-            res.status(200).json({message: 'Sauce supprimé.'});
+        console.log (funcName + " Found sauce id = ", req.params.id);
+        const filename = sauce.imageUrl.split('/images/')[1];
+        console.log (funcName + " Image Filename to remove  = ", filename);
+
+        fs.unlink(`images/${filename}`, () => {
+            // Image sauce is deleted 
+            console.log (funcName + " Deleted filename   = ", filename);
+            // Delete the object Sauce in Mongodb  
+            Sauce.deleteOne({_id: req.params.id})
+            .then(() => {
+                console.log (funcName + " Deleted sauce id  = ", req.params.id);
+                res.status(200).json({message: 'Sauce supprimé.'})
+
             })
-    .catch(error => res.status(400).json({error}));
+            .catch(error => res.status(400).json({error}));
+            });
+
+        })
+    .catch(error => {
+        console.log (funcName + " Error Not Deleted file   = ", error);
+        res.status(400).json({error})
+    } );
 
    //  res.status(200).json({message: 'Sauce supprimé.'});
 /*    
@@ -81,16 +99,107 @@ exports.deleteSauce = (req, res, next) =>{
 
 */                    
 }
-    
+
+
+// 6. UPDATE SAUCE 
+/*
+PUT /api/sauces/:id 
+EITHER
+Sauce as JSON
+OR { sauce: String,
+image: File }
+The response :  { message: String }
+
+*/
+
+exports.upDateSauce = (req, res, next) => {
+    const funcName =  scriptname + ' - upDateSauce : ';
+    // Search for a sauce with the id 
+    console.log("============");
+   //  console.log (funcName + " req  = ", req );
+    console.log (funcName + " req file  = ", req.file );
+    console.log (funcName + " req image  = ", req.image );
+    console.log (funcName + " req body  = ", req.body );
+
+   if (req.file ) {
+       // The image is to udpate  :  Sauce as JSON
+    console.log (funcName + " Image to update   ");
+    Sauce.findOne({_id: req.params.id})
+    .then(sauce => {
+
+        console.log (funcName + " Found in MongoDB sauce id = ", req.params.id);
+        let url0 = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+
+        const filename = sauce.imageUrl.split('/images/')[1];
+        console.log (funcName + " deleting this file  = ", filename);
+        fs.unlink(`images/${filename}`, () => {
+            console.log (funcName + " Ok deleted file  = ", filename);
+            let osauce =  JSON.parse(req.body.sauce);
+            console.log (funcName + " req osauce  = ", osauce);
+            console.log (funcName + "  imageUrl  = ", url0);
+            const sauceObject = {
+                  ...osauce,
+                imageUrl: url0,
+            };
+
+            console.log (funcName + " input sauce  = ", sauceObject);
+
+            Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+            .then(() =>{ 
+                console.log (funcName + " OK sauce updated -  id   = ", req.params.id);
+                console.log("============");
+                res.status(200).json({ message: 'Sauce modifiée avec succès !' });
+            })
+            .catch(error => res.status(400).json({ error }))
+        })    ;
+        // .catch(error => res.status(500).json({ error })); 
+
+    })
+    .catch(error => {
+        console.log (funcName + " Error Sauce update - error    = ", error);
+        res.status(400).json({error})
+    } );    
+   }
+   else {
+   // The image is not updated :  Sauce as JSON
+   // ============================================
+
+    console.log (funcName + " No  image to update   ");
+    const sauceObject = { ...req.body } ;
+    Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+        .then(() => {
+         console.log (funcName + " OK sauce updated -  id   = ", req.params.id);
+         console.log("============");
+         res.status(200).json({ message: 'Sauce modifiée avec succès !' })
+        })
+        .catch(error => res.status(400).json({ error }));
+
+   }
+
+
+
+}
+
+
 
 // 5. LIKE  DISLIKE SAUCE     
+// /api/sauces/:id/like
+// { userId: String, like: Number }
+// { message: String }
+
     exports.likeDisslikeSauce = (req, res, next) => {
+
+        const funcName =  scriptname + ' - likeDisslikeSauce : ';
+        const userId = req.body.userId;
+        const like = req.body.like;
+        // Search for a sauce with the id 
+        console.log("============");
+        console.log (funcName + " userId   ", userId);
+        console.log (funcName + " like   ", like);
+        res.status(201).json({message: 'like/dislike mis à jour.'})
 
     }
 
-// 6. UPDATE SAUCE 
-exports.upDateSauce = (req, res, next) => {
 
-}
 
 console.log (scriptname + 'end '  );
