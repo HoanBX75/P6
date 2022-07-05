@@ -42,6 +42,7 @@ exports.createSauce = (req, res, next) => {
         
     
 // 2. GET ALL SAUCE
+
 exports.getAllSauce = (req, res, next) => {
     console.log (scriptname + 'getAllSauce '  );
         Sauce.find()
@@ -132,6 +133,8 @@ exports.upDateSauce = (req, res, next) => {
 
         const filename = sauce.imageUrl.split('/images/')[1];
         console.log (funcName + " deleting this file  = ", filename);
+
+        
         fs.unlink(`images/${filename}`, () => {
             console.log (funcName + " Ok deleted file  = ", filename);
             let osauce =  JSON.parse(req.body.sauce);
@@ -255,8 +258,6 @@ exports.upDateSauce = (req, res, next) => {
                 likes: new_usersLiked.length,
                 dislikes: new_usersDisliked.length
             }
-
-           
 
             Sauce.updateOne({ _id: req.params.id }, {...newSauceLikeDislike, _id: req.params.id})
             .then(()=> res.status(201).json({message: 'like/dislike mis à jour.'}))
