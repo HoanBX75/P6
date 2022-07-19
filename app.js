@@ -56,15 +56,5 @@ app.use('/api/auth/', userRoutes);
 app.use('/api/sauces/', sauceRoutes);
 
 
-/*
-app.use('/api/auth/', userRoutes);
-app.use('/api/sauces/', sauceRoutes);
-app.use('/api/sauce/:id/like', sauceRoutes);
-*/
-/*
-app.use((req, res) => {
-   res.json({ message: 'Hello, Votre requête a bien été reçue !!' }); 
-});
-*/
 
 module.exports = app;
