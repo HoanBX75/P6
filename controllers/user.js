@@ -5,11 +5,12 @@ require('dotenv').config();
 console.log ("controller : begin");
 
 
-
-/*  -----------------------------------------------------------------------  
+/* 
+ -----------------------------------------------------------------------  
 1. USER SIGN UP   : signup()
 ---------------------------------------------------------------------------
 API : POST /api/auth/signup
+
 Input : req.body.email, req.body.password
 { email: string,password: string }
 
@@ -59,10 +60,12 @@ exports.signup = (req, res, next) => {
   };
 
 
-/*  -----------------------------------------------------------------------  
+/*  
+-----------------------------------------------------------------------  
 1. USER SIGN IN   : login()
 ---------------------------------------------------------------------------
 API : POST /api/auth/signup
+
 Input : 
 { email: string,password: string }
 
@@ -73,11 +76,7 @@ This function is in charge of the user signs in.
   - if it is equal, 
       then a  token is generated  using the user id .
 
-
-
 The response :  { message: String }
-
-
 */
 
 
@@ -111,9 +110,7 @@ The response :  { message: String }
               console.log (funcName + 'Wrong password  req.body.password', req.body.password    ); 
               return res.status(401).json({ error: 'Wrong password  !' });
             }
-
-
-            
+        
             console.log (funcName + 'controllers Providing the token'   ); 
 
             // Create  Token and send it in the response 
