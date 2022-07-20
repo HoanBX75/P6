@@ -1,18 +1,24 @@
 const Sauce = require('../models/sauce');
 const fs = require('fs');
+const scriptSaucename = 'controllers/sauce.js : ';
 
-scriptname = 'controllers/sauce.js : ';
-console.log (scriptname + 'begin '  );
+/*
+  This file is a set of middlewares handling sauce requests.
+*/
 
 
-/*  -----------------------------------------------------------------------  
-1. CREATE   SAUCE  : createSauce()
+/*  
+-----------------------------------------------------------------------  
+1. CREATE SAUCE  : createSauce()
 ---------------------------------------------------------------------------
 API : POST  /api/sauces
-
-
+-----------------------------------------------------------------------
 Description : 
 This function creates  a sauce in mongodb.
+It does the following : 
+    - extract the sauce attributes from the request body
+    - build the other sauce attributes
+    - Create the sauce in the mongodb 
 
 Inputs : 
 Input  sauce information is stored in  the body as :
@@ -23,20 +29,24 @@ In response, it returns a message  as  { message: String }
 
 
 exports.createSauce = (req, res, next) => {
-    const funcName =  scriptname + ' - createSauce : ';
+    const funcName =  scriptSaucename + ' - createSauce() : ';
     console.log("========================================================================>")
     console.log (funcName + 'begin '  );
     console.log (funcName  + " req.body = ", req.body);
     console.log (funcName  + " req.body.sauce  = ", req.body.sauce );
+
+    // Get sauce fields from the request body
+    // -------------------------------------
     const sauceObjet = JSON.parse(req.body.sauce);
-    console.log (funcName  + " req.sauceObjet = ", sauceObjet);
+    console.log (funcName  + " sauceObjet = ", sauceObjet);
     
     delete req.body._id
       
     let url0 = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
     console.log (funcName  + " url0  ", url0);
 
-    // Sauce object :
+    // Build Model Sauce object :
+    // -------------------------
     const sauce = new Sauce ({
                 ...sauceObjet,
                 likes: 0,
@@ -46,8 +56,9 @@ exports.createSauce = (req, res, next) => {
                 usersDisliked: [],
     })
     console.log (funcName  + " model Sauce  ", sauce);
-      
-           
+               
+    // Create Sauce object in mongodb
+    // ------------------------------
     sauce.save()
     .then(() => {
         console.log (funcName + 'OK sauce created  ');  
@@ -59,14 +70,14 @@ exports.createSauce = (req, res, next) => {
     })
 }
         
-    
 
-/*  -----------------------------------------------------------------------  
+/*  
+-----------------------------------------------------------------------  
 3. GET ALL  SAUCES  : getAllSauce()
----------------------------------------------------------------------------
+-----------------------------------------------------------------------
 API : GET  /api/sauces/
 id : identifier of a sauce 
-
+-----------------------------------------------------------------------
 Description : 
 This function gets  all sauces  from mongodb.
 In the response, it returns a Json table containing all the sauces (a 
@@ -75,41 +86,49 @@ Returns Array of sauce
 */
 
 exports.getAllSauce = (req, res, next) => {
-    const funcName =  scriptname + ' - getAllSauce() : ';
+   
+    const funcName =  scriptSaucename + ' - getAllSauce() : ';
     console.log("========================================================================>");
     console.log (funcName + 'begin '  );
 
-        Sauce.find()
-        .then(sauces => {
+    // Get Sauces object from  mongodb
+    // --------------------------------
+
+    Sauce.find()
+    .then(sauces => {
             /* Sauces are obtained */
             console.log (funcName + 'OK got  sauces  ');   
             res.status(200).json(sauces)
-        })
+    })
         .catch(error => { 
             /* Error  occured  */
             console.log (funcName + ' Error  =  ', error   ); 
             res.status(400).json({error})
-        });
-    }
+    });
+}
 
-
-/*  -----------------------------------------------------------------------  
+/*  
+-----------------------------------------------------------------------  
 3. GET ONE  SAUCE  : getOneSauce()
----------------------------------------------------------------------------
+-----------------------------------------------------------------------
 API : GET /api/sauces/:id 
 id : identifier of a sauce 
-
+-----------------------------------------------------------------------
 Description : 
 This function gets  a sauce information from mongodb.
 In the response, it returns a Json string form the returned 
 model object sauce obtained from mongodb. 
+
 Returns a Single sauce 
 */
 
 exports.getOneSauce = (req, res, next) => {
-        const funcName =  scriptname + ' - getOneSauce() : ';
+        const funcName =  scriptSaucename + ' - getOneSauce() : ';
         console.log("========================================================================>");
         console.log (funcName + 'begin '  );
+
+        // Get Sauce object from  mongodb
+        // --------------------------------
 
         Sauce.findOne({_id: req.params.id})
         .then(sauce => { 
@@ -122,15 +141,15 @@ exports.getOneSauce = (req, res, next) => {
             console.log (funcName + ' Error  =  ', error   ); 
             res.status(400).json({error})
         });
-    }
+}
 
-
-/*  -----------------------------------------------------------------------  
+/*  
+-----------------------------------------------------------------------  
 4. DELETE  SAUCE  : deleteSauce()
----------------------------------------------------------------------------
-API : PUT /api/sauces/:id 
+-----------------------------------------------------------------------
+API : DELETE  /api/sauces/:id 
 id : identifier of a sauce 
-
+-----------------------------------------------------------------------
 Description : 
 This function deletes  a sauce.
    Get the sauce from mongodb
@@ -145,9 +164,8 @@ The response :  { message: String }
 
 */
 
-
 exports.deleteSauce = (req, res, next) =>{
-    const funcName =  scriptname + ' - deleteSauce() : ';
+    const funcName =  scriptSaucename + ' - deleteSauce() : ';
     console.log("========================================================================>");
     console.log (funcName + " sauce id (params id ) = ", req.params.id);
 
@@ -212,12 +230,13 @@ exports.deleteSauce = (req, res, next) =>{
     } );          
 }
 
-/*  -----------------------------------------------------------------------  
+/*  
+-----------------------------------------------------------------------  
 5. UPDATE SAUCE  : upDateSauce()
----------------------------------------------------------------------------
+-----------------------------------------------------------------------
 API : PUT /api/sauces/:id 
 id : identifier of a sauce 
-
+-----------------------------------------------------------------------
 Description : 
 This function updates  a sauce.
    Get the sauce from mongodb
@@ -257,7 +276,7 @@ The response :  { message: String }
 */
 
 exports.upDateSauce = (req, res, next) => {
-    const funcName =  scriptname + ' - upDateSauce : ';
+    const funcName =  scriptSaucename + ' - upDateSauce() : ';
  
     console.log("========================================================================>");
    //  console.log (funcName + " req  = ", req );
@@ -375,13 +394,13 @@ exports.upDateSauce = (req, res, next) => {
 }
 
 
-
-/*  -----------------------------------------------------------------------  
+/*  
+-----------------------------------------------------------------------  
 5. LIKE  DISLIKE SAUCE :  likeDisslikeSauce()
----------------------------------------------------------------------------
-API /api/sauces/:id/like
+-----------------------------------------------------------------------
+API  POST  /api/sauces/:id/like
 id is the sauce Id
-
+-----------------------------------------------------------------------
 Description : 
 This function gives a Like status for a sauce and according to a user.
 if like = 0 then it cancels the like or dislike by removing the user 
@@ -396,12 +415,9 @@ Returns :
 In response, it returns a message  as  { message: String }
 */
 
-// 5. LIKE  DISLIKE SAUCE     
 
-
-    exports.likeDisslikeSauce = (req, res, next) => {
-
-        const funcName =  scriptname + ' - likeDisslikeSauce() : ';
+exports.likeDisslikeSauce = (req, res, next) => {
+        const funcName =  scriptSaucename + ' - likeDisslikeSauce() : ';
 
         console.log("========================================================================>")
 
@@ -494,4 +510,4 @@ In response, it returns a message  as  { message: String }
 
 }
 
-console.log (scriptname + 'end '  );
+console.log (scriptSaucename + 'loaded  '  );

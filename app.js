@@ -23,8 +23,6 @@ mongoose.connect(MY_CONNECT,
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 
-
-
 const app = express();
 
 // Allow cross origin, methods, and header attributes 
@@ -51,10 +49,7 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 // Routes 
 // ------
 
-
 app.use('/api/auth/', userRoutes);
 app.use('/api/sauces/', sauceRoutes);
-
-
 
 module.exports = app;
