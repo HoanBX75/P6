@@ -22,14 +22,13 @@ mongoose.connect(MY_CONNECT,
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
-
+// Create the express 
 const app = express();
 
 // Allow cross origin, methods, and header attributes 
 // -------------------------------------------------
  
 app.use((req, res, next) => {
-    console.log ("apps.js : authorizations ");
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');

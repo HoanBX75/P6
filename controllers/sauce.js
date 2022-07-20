@@ -260,7 +260,7 @@ Inputs :
     }
 
     2/ with a file :  (the sauce information is in the body as a sauce String   )
-         req.body.sauce : String 
+        req.body.sauce : String 
                     sauce: '{"name":"dd","manufacturer":"lalou",
                     "description":"good sauce with vegetables","mainPepper":"phuquoc",
                      "heat":2,"userId":"62cc25078cd326528ddeb819"}'
@@ -409,7 +409,7 @@ If like =1  then the user is added to a like list .
 if the like = -1  then the user is in the  dislike list 
 
 Inputs : 
-In the body 
+In the body (req.body.userId , req.body.like)
   { userId: String, like: Number }
 Returns : 
 In response, it returns a message  as  { message: String }
@@ -433,9 +433,9 @@ exports.likeDisslikeSauce = (req, res, next) => {
         Sauce.findOne({_id: req.params.id})
         .then((sauce) => {
 
-             // Get the  likes 
-             let usersLiked =  sauce.usersLiked;
-             let usersDisliked =  sauce.usersDisliked;
+            // Get the  likes 
+            let usersLiked =  sauce.usersLiked;
+            let usersDisliked =  sauce.usersDisliked;
             let new_usersLiked = [];
             let new_usersDisliked =  [];
 
