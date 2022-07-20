@@ -35,6 +35,7 @@ const errorHandler = error => {
   }
 };
 
+// Create the server from  app (express)
 const server = http.createServer(app);
 
 server.on('error', errorHandler);
