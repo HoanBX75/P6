@@ -24,6 +24,7 @@ module.exports = (req, res, next) => {
     const decodedToken = jwt.verify(token, secret_token);
     const userId = decodedToken.userId;
     console.log (scriptAuthName + 'token userId  = ',  userId);
+    console.log (scriptAuthName + 'req  = ',  req);
 
     if (req.body.userId && req.body.userId !== userId) {
       console.log (scriptAuthName + 'Authorization NOK invalid user', req.body.userId)
@@ -32,7 +33,8 @@ module.exports = (req, res, next) => {
       console.log (scriptAuthName + 'Authorization OK');
       /* add the userId to the req */
       /* ------------------------- */
-      req.userId = userId; /* store  userId as it will be use to control sauce acess */
+      req.userId = userId; /* store  userId as it will be use to control the  access 
+                             when updating a sauce */
       next();
     }
 
