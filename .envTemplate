@@ -1,0 +1,2 @@
+MY_CONNECT=<your_mongodb_connect_string>
+SECRET_TOKEN=<your_secret_token>
