@@ -43,4 +43,4 @@ const storage = multer.diskStorage({
 
 module.exports = multer({storage}).single('image');
 
-console.log (scriptMultername + 'loaded '  );
+
